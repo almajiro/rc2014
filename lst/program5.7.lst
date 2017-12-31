@@ -1,0 +1,79 @@
+              	; --------------------------------------
+              	; zasm: assemble "program5.7.asm"
+              	; date: 2017-12-31 16:28:00
+              	; --------------------------------------
+
+
+              	;*************************************************************************
+              	;   プログラム5.7   基本論理ゲートプログラム
+              	;*************************************************************************
+0090:         	CW      EQU     90H         ; コントロールワード
+00F3:         	CWR     EQU     0F3H        ; コントロールワードレジスタの番地
+00F0:         	PADR    EQU     0F0H        ; ポートAデータレジスタの番地
+00F1:         	PBDR    EQU     0F1H        ; ポートBデータレジスタの番地
+00F2:         	PCDR    EQU     0F2H        ; ポートCデータレジスタの番地
+              	
+8000:         	        ORG     8000H
+8000: 3E90    	        LD      A, CW       ; コントロールワードのセット
+8002: D3F3    	        OUT     (CWR), A    ; コントロールワードレジスタへの出力
+              	
+8004: DBF0    	STEP:   IN      A, (PADR)   ; スイッチデータの入力
+8006: 47      	        LD      B, A        ; レジスタB（作業用）への退避
+8007: 0E00    	        LD      C, 00H      ; レジスタC（結果）をクリア
+              	
+8009: CB47    	        BIT     0, A        ; NOT
+800B: C21080  	        JP      NZ, NT
+800E: CBC1    	        SET     0, C
+8010: 00      	NT:     NOP
+              	
+8011: CB3F    	        SRL     A           ; NANDの準備
+8013: CB38    	        SRL     B
+8015: CB38    	        SRL     B
+              	
+8017: A0      	        AND     B           ; NAND
+8018: 2F      	        CPL
+8019: CB47    	        BIT     0, A
+801B: CA2080  	        JP      Z, ND
+801E: CBC9    	        SET     1, C
+8020: 00      	ND:     NOP
+              	
+8021: 78      	        LD      A, B        ; NORの準備
+8022: CB3F    	        SRL     A
+8024: CB38    	        SRL     B
+8026: CB38    	        SRL     B
+              	
+8028: B0      	        OR      B           ; NOR
+8029: 2F      	        CPL
+802A: CB47    	        BIT     0, A
+802C: CA3180  	        JP      Z, NR
+802F: CBD1    	        SET     2, C
+8031: 00      	NR:     NOP
+              	
+8032: 79      	        LD      A, C        ; 点灯データの出力
+8033: D3F2    	        OUT     (PCDR), A
+              	
+8035: C30480  	        JP      STEP        ; 繰り返し
+              	        END
+
+
+; +++ segments +++
+
+#CODE          = $8000 = 32768,  size = $0038 =    56
+
+; +++ global symbols +++
+
+CW      = $0090 =   144          program5.7.asm:4
+CWR     = $00F3 =   243          program5.7.asm:5
+ND      = $8020 = 32800          program5.7.asm:32
+NR      = $8031 = 32817          program5.7.asm:44
+NT      = $8010 = 32784          program5.7.asm:21
+PADR    = $00F0 =   240          program5.7.asm:6
+PBDR    = $00F1 =   241          program5.7.asm:7 (unused)
+PCDR    = $00F2 =   242          program5.7.asm:8
+STEP    = $8004 = 32772          program5.7.asm:14
+_end    = $8038 = 32824          program5.7.asm:9 (unused)
+_size   = $0038 =    56          program5.7.asm:9 (unused)
+
+
+total time: 0.0018 sec.
+no errors
