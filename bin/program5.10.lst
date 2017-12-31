@@ -1,0 +1,100 @@
+              	; --------------------------------------
+              	; zasm: assemble "program5.10.asm"
+              	; date: 2017-12-31 17:23:02
+              	; --------------------------------------
+
+
+              	;*************************************************************************
+              	;   プログラム5.10  ライントレースカープログラム
+              	;*************************************************************************
+9000:         	SP_A    EQU     9000H       ; SPの設定
+0090:         	CW      EQU     90H         ; コントロールワード
+00F3:         	CWR     EQU     0F3H        ; コントロールワードレジスタの番地
+00F0:         	PADR    EQU     0F0H        ; ポートAデータレジスタの番地
+00F1:         	PBDR    EQU     0F1H        ; ポートBデータレジスタの番地
+00F2:         	PCDR    EQU     0F2H        ; ポートCデータレジスタの番地
+              	
+8000:         	        ORG     8000H
+8000: 3E90    	        LD      A, CW       ; コントロールワードのセット
+8002: D3F3    	        OUT     (CWR), A    ; コントロールワードレジスタへの出力
+8004: 310090  	        LD      SP, SP_A    ; SPの設定
+              	
+8007: 3E00    	        LD      A, 00H      ; モータ停止
+8009: D3F2    	        OUT     (PCDR), A
+              	
+800B: CD1580  	STEP1:  CALL    READ1       ; センサ読み込み
+800E: CD2780  	        CALL    MOT1        ; モータ制御
+8011: C30B80  	        JP      STEP1
+              	
+8014: 76      	        HALT
+              	
+8015: DBF0    	READ1:  IN      A, (PADR)   ; １回目センサ入力
+8017: 0603    	        LD      B, 03H      ; マスク用データ
+8019: A0      	        AND     B           ; マスク
+801A: 4F      	        LD      C, A        ; データ退避
+              	
+801B: CD4080  	        CALL    TIM2        ; タイマサブルーチン呼び出し
+              	
+801E: DBF0    	        IN      A, (PADR)   ; ２回目センサ入力
+8020: A0      	        AND     B           ; マスク
+              	
+8021: B9      	        CP      C           ; データの比較
+8022: C21580  	        JP      NZ, READ1   ; 不一致の場合は棄却
+8025: 47      	        LD      B, A
+8026: C9      	        RET
+              	
+8027: CB48    	MOT1:   BIT     1, B        ; 左センサ黒か
+8029: C23680  	        JP      NZ, MOT2
+802C: CB40    	        BIT     0, B        ; 右センサ黒か
+802E: C23B80  	        JP      NZ, MOT3
+8031: 3E03    	        LD      A, 03H      ; 直進
+8033: C33D80  	        JP      MOT4
+8036: 3E01    	MOT2:   LD      A, 01H      ; 左折
+8038: C33D80  	        JP      MOT4
+803B: 3E02    	MOT3:   LD      A, 02H      ; 右折
+803D: D3F2    	MOT4:   OUT     (PCDR), A
+803F: C9      	        RET
+              	
+8040: 1632    	TIM2:   LD      D, 50D      ; 上位のタイマサブルーチン5.129ms
+8042: CD4A80  	L2:     CALL    TIM1
+8045: 15      	        DEC     D
+8046: C24280  	        JP      NZ, L2
+8049: C9      	        RET
+              	
+804A: 1E43    	TIM1:   LD      E, 67D      ; 下位のタイマサブルーチン100µs
+804C: 1D      	L1:     DEC     E
+804D: 00      	        NOP
+804E: C24C80  	        JP      NZ, L1
+8051: C9      	        RET
+              	
+              	        END
+
+
+; +++ segments +++
+
+#CODE          = $8000 = 32768,  size = $0052 =    82
+
+; +++ global symbols +++
+
+CW      = $0090 =   144          program5.10.asm:5
+CWR     = $00F3 =   243          program5.10.asm:6
+L1      = $804C = 32844          program5.10.asm:59
+L2      = $8042 = 32834          program5.10.asm:53
+MOT1    = $8027 = 32807          program5.10.asm:40
+MOT2    = $8036 = 32822          program5.10.asm:46
+MOT3    = $803B = 32827          program5.10.asm:48
+MOT4    = $803D = 32829          program5.10.asm:49
+PADR    = $00F0 =   240          program5.10.asm:7
+PBDR    = $00F1 =   241          program5.10.asm:8 (unused)
+PCDR    = $00F2 =   242          program5.10.asm:9
+READ1   = $8015 = 32789          program5.10.asm:25
+SP_A    = $9000 = 36864          program5.10.asm:4
+STEP1   = $800B = 32779          program5.10.asm:19
+TIM1    = $804A = 32842          program5.10.asm:58
+TIM2    = $8040 = 32832          program5.10.asm:52
+_end    = $8052 = 32850          program5.10.asm:10 (unused)
+_size   = $0052 =    82          program5.10.asm:10 (unused)
+
+
+total time: 0.0021 sec.
+no errors
