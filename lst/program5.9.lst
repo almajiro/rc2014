@@ -1,0 +1,72 @@
+              	; --------------------------------------
+              	; zasm: assemble "program5.9.asm"
+              	; date: 2017-12-31 17:10:39
+              	; --------------------------------------
+
+
+              	;*************************************************************************
+              	;   プログラム5.9   チャタリング除去プログラム
+              	;*************************************************************************
+9000:         	SP_A    EQU     9000H       ; SPの設定
+0090:         	CW      EQU     90H         ; コントロールワード
+00F3:         	CWR     EQU     0F3H        ; コントロールワードレジスタの番地
+00F0:         	PADR    EQU     0F0H        ; ポートAデータレジスタの番地
+00F1:         	PBDR    EQU     0F1H        ; ポートBデータレジスタの番地
+00F2:         	PCDR    EQU     0F2H        ; ポートCデータレジスタの番地
+              	
+8000:         	        ORG     8000H
+8000: 3E90    	        LD      A, CW       ; コントロールワードのセット
+8002: D3F3    	        OUT     (CWR), A    ; コントロールワードレジスタへの出力
+8004: 310090  	        LD      SP, SP_A    ; SPの設定
+              	
+8007: DBF0    	STEP:   IN      A, (PADR)   ; １回目スイッチデータの入力
+8009: 0601    	        LD      B, 01H      ; マスク用データ
+800B: A0      	        AND     B           ; マスク
+800C: 4F      	        LD      C, A        ; データ退避
+              	
+800D: CD1780  	        CALL    TIM2        ; タイマサブルーチン呼び出し
+              	
+8010: DBF0    	        IN      A, (PADR)   ; ２回目スイッチデータの入力
+8012: A0      	        AND     B           ; マスク
+              	
+8013: B9      	        CP      C           ; データの比較
+8014: C20780  	        JP      NZ, STEP    ; 繰り返し
+              	
+8017: 1632    	TIM2:   LD      D, 50D      ; 上位のタイマサブルーチン5.129ms
+8019: CD2180  	L2:     CALL    TIM1
+801C: 15      	        DEC     D
+801D: C21980  	        JP      NZ, L2
+8020: C9      	        RET
+              	
+8021: 1E43    	TIM1:   LD      E, 67D      ; 下位のタイマサブルーチン100µs
+8023: 1D      	L1:     DEC     E
+8024: 00      	        NOP
+8025: C22380  	        JP      NZ, L1
+8028: C9      	        RET
+              	
+              	        END
+
+
+; +++ segments +++
+
+#CODE          = $8000 = 32768,  size = $0029 =    41
+
+; +++ global symbols +++
+
+CW      = $0090 =   144          program5.9.asm:5
+CWR     = $00F3 =   243          program5.9.asm:6
+L1      = $8023 = 32803          program5.9.asm:36
+L2      = $8019 = 32793          program5.9.asm:30
+PADR    = $00F0 =   240          program5.9.asm:7
+PBDR    = $00F1 =   241          program5.9.asm:8 (unused)
+PCDR    = $00F2 =   242          program5.9.asm:9 (unused)
+SP_A    = $9000 = 36864          program5.9.asm:4
+STEP    = $8007 = 32775          program5.9.asm:16
+TIM1    = $8021 = 32801          program5.9.asm:35
+TIM2    = $8017 = 32791          program5.9.asm:29
+_end    = $8029 = 32809          program5.9.asm:10 (unused)
+_size   = $0029 =    41          program5.9.asm:10 (unused)
+
+
+total time: 0.0019 sec.
+no errors
