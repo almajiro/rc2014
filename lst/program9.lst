@@ -1,0 +1,40 @@
+              	; --------------------------------------
+              	; zasm: assemble "program9.asm"
+              	; date: 2018-01-01 13:24:29
+              	; --------------------------------------
+
+
+              	;--------------------------------------
+              	;   演習プログラム9
+              	;--------------------------------------
+8000:         	        ORG     8000H
+8000: 3A009C  	        LD      A, (DATA)
+8003: 47      	        LD      B, A
+8004: 3A019C  	        LD      A, (DATA + 1)
+8007: 80      	        ADD     A, B
+8008: 32029C  	        LD      (STORE), A 
+800B: 76      	        HALT
+              	
+800C: FFFFFFFF	        ORG     9C00H
+8010: FF...   	
+9C00: 28      	DATA    DEFB    28H
+9C01: 74      	        DEFB    74H
+9C02: FF      	STORE   DEFS    1
+              	
+              	        END
+
+
+; +++ segments +++
+
+#CODE          = $8000 = 32768,  size = $1C03 =  7171
+
+; +++ global symbols +++
+
+DATA    = $9C00 = 39936          program9.asm:13
+STORE   = $9C02 = 39938          program9.asm:15
+_end    = $9C03 = 39939          program9.asm:3 (unused)
+_size   = $1C03 =  7171          program9.asm:3 (unused)
+
+
+total time: 0.0012 sec.
+no errors
