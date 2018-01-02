@@ -1,0 +1,60 @@
+              	; --------------------------------------
+              	; zasm: assemble "program18.asm"
+              	; date: 2018-01-02 16:53:37
+              	; --------------------------------------
+
+
+              	;--------------------------------------
+              	;   演習プログラム18
+              	;--------------------------------------
+8000:         	        ORG     8000H
+              	
+              	        ; 準備
+8000: 3A019C  	        LD      A, (DATA + 1)
+8003: 47      	        LD      B, A            ; 割る数
+8004: 3A009C  	        LD      A, (DATA)       ; 割られる数
+8007: 0E00    	        LD      C, 00H          ; 商
+              	
+8009: B8      	LOOP:   CP      A, B
+800A: FA1180  	        JP      M, FIN
+800D: 90      	        SUB     A, B
+              	;        CALL    CNTUP
+800E: C30980  	        JP      LOOP
+              	
+8011: 32039C  	FIN:    LD      (STORE + 1), A
+8014: 79      	        LD      A, C
+8015: 32029C  	        LD      (STORE), A
+              	
+8018: 76      	        HALT
+              	        
+              	;CNTUP:  PUSH    AF
+              	;        LD      A,  C
+              	;        ADD     A, 01H
+              	;        LD      C, A
+              	;        POP     AF
+              	;        RET
+              	
+8019: FFFFFFFF	        ORG     9C00H
+801D: FF...   	
+9C00: 52      	DATA    DEFB    52H
+9C01: 0B      	        DEFB    0BH
+9C02: FFFF    	STORE   DEFS    2
+              	        END
+
+
+; +++ segments +++
+
+#CODE          = $8000 = 32768,  size = $1C04 =  7172
+
+; +++ global symbols +++
+
+DATA    = $9C00 = 39936          program18.asm:32
+FIN     = $8011 = 32785          program18.asm:18
+LOOP    = $8009 = 32777          program18.asm:12
+STORE   = $9C02 = 39938          program18.asm:34
+_end    = $9C04 = 39940          program18.asm:3 (unused)
+_size   = $1C04 =  7172          program18.asm:3 (unused)
+
+
+total time: 0.0013 sec.
+no errors
