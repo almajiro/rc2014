@@ -1,0 +1,75 @@
+              	; --------------------------------------
+              	; zasm: assemble "program19.asm"
+              	; date: 2018-01-02 18:04:31
+              	; --------------------------------------
+
+
+              	;--------------------------------------
+              	;   演習プログラム19
+              	;--------------------------------------
+8000:         	        ORG     8000H
+              	
+              	        ; 準備
+8000: 3A019C  	        LD      A, (DATA + 1)
+8003: 47      	        LD      B, A            ; 割る数
+8004: 3A009C  	        LD      A, (DATA)       ; 割られる数
+8007: 0E00    	        LD      C, 00H          ; 商
+8009: 1601    	        LD      D, 01H          ; マスク
+              	
+800B: B8      	LOOP1:  CP      B
+800C: FA1680  	        JP      M, NEXT
+800F: CB20    	        SLA     B
+8011: CB22    	        SLA     D
+8013: C30B80  	        JP      LOOP1
+              	
+8016: CB38    	NEXT:   SRL     B
+8018: CB3A    	        SRL     D
+              	
+801A: B8      	LOOP2:  CP      B
+801B: FA2980  	        JP      M, FIN
+801E: 90      	        SUB     B
+801F: CD3180  	        CALL    CNTUP
+8022: CB3A    	        SRL     D
+8024: CB38    	        SRL     B
+8026: C21A80  	        JP      NZ, LOOP2
+              	
+8029: 32039C  	FIN     LD      (STORE + 1), A
+802C: 79      	        LD      A, C
+802D: 32029C  	        LD      (STORE), A
+8030: 76      	        HALT
+              	
+              	        
+8031: F5      	CNTUP:  PUSH    AF
+8032: 79      	        LD      A, C
+8033: 82      	        ADD     A, D
+8034: 4F      	        LD      C, A
+8035: F1      	        POP     AF
+8036: C9      	        RET
+              	
+8037: FFFFFFFF	        ORG     9C00H
+803B: FF...   	
+9C00: 52      	DATA    DEFB    52H
+9C01: 0B      	        DEFB    0BH
+9C02: FFFF    	STORE   DEFS    2
+              	        END
+
+
+; +++ segments +++
+
+#CODE          = $8000 = 32768,  size = $1C04 =  7172
+
+; +++ global symbols +++
+
+CNTUP   = $8031 = 32817          program19.asm:36
+DATA    = $9C00 = 39936          program19.asm:44
+FIN     = $8029 = 32809          program19.asm:30
+LOOP1   = $800B = 32779          program19.asm:13
+LOOP2   = $801A = 32794          program19.asm:22
+NEXT    = $8016 = 32790          program19.asm:19
+STORE   = $9C02 = 39938          program19.asm:46
+_end    = $9C04 = 39940          program19.asm:3 (unused)
+_size   = $1C04 =  7172          program19.asm:3 (unused)
+
+
+total time: 0.0015 sec.
+no errors
