@@ -1,0 +1,48 @@
+              	; --------------------------------------
+              	; zasm: assemble "program20.asm"
+              	; date: 2018-01-13 17:03:56
+              	; --------------------------------------
+
+
+              	;--------------------------------------
+              	;   演習プログラム20
+              	;--------------------------------------
+0080:         	CW      EQU     80H         ; コントロールワード
+00F3:         	CWR     EQU     0F3H        ; コントロールワードレジスタ
+00F0:         	PADR    EQU     0F0H        ; PORTAレジスタ
+00F1:         	PBDR    EQU     0F1H        ; PORTBレジスタ
+00F2:         	PCDR    EQU     0F2H        ; PORTCレジスタ
+0069:         	LED     EQU     069H        ; LED点灯パターン
+              	
+C000:         	        ORG     0C000H
+C000: 3E80    	        LD      A, CW       ; コントロールワードをAレジスタへ
+C002: D3F3    	        OUT     (CWR), A    ; コントロールワードレジスタへ出力
+              	
+C004: 3E69    	        LD      A, LED      ; 点灯パターンをAレジスタへ
+C006: D3F2    	        OUT     (PCDR), A   ; PORTCレジスタへ出力
+              	
+C008: C9      	        RET
+              	
+              	        END
+              	
+              	        
+
+
+; +++ segments +++
+
+#CODE          = $C000 = 49152,  size = $0009 =     9
+
+; +++ global symbols +++
+
+CW      = $0080 =   128          program20.asm:4
+CWR     = $00F3 =   243          program20.asm:5
+LED     = $0069 =   105          program20.asm:9
+PADR    = $00F0 =   240          program20.asm:6 (unused)
+PBDR    = $00F1 =   241          program20.asm:7 (unused)
+PCDR    = $00F2 =   242          program20.asm:8
+_end    = $C009 = 49161          program20.asm:10 (unused)
+_size   = $0009 =     9          program20.asm:10 (unused)
+
+
+total time: 0.0014 sec.
+no errors
