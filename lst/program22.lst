@@ -1,0 +1,49 @@
+              	; --------------------------------------
+              	; zasm: assemble "program22.asm"
+              	; date: 2018-01-14 12:49:20
+              	; --------------------------------------
+
+
+              	;--------------------------------------
+              	;   演習プログラム22
+              	;--------------------------------------
+0090:         	CW      EQU     90H         ; コントロールワード
+00F3:         	CWR     EQU     0F3H        ; コントロールワードレジスタ
+00F0:         	PADR    EQU     0F0H        ; PORTAレジスタ
+00F1:         	PBDR    EQU     0F1H        ; PORTBレジスタ
+00F2:         	PCDR    EQU     0F2H        ; PORTCレジスタ
+              	
+C000:         	        ORG     0C000H
+C000: 3E90    	        LD      A, CW       ; コントロールワードをAレジスタへ
+C002: D3F3    	        OUT     (CWR), A    ; コントロールワードレジスタへ出力
+              	
+C004: DBF0    	LOOP:   IN      A, (PADR)
+C006: D3F2    	        OUT     (PCDR), A
+              	
+C008: C304C0  	        JP      LOOP
+              	
+C00B: C9      	        RET
+              	
+              	        END
+              	
+              	        
+
+
+; +++ segments +++
+
+#CODE          = $C000 = 49152,  size = $000C =    12
+
+; +++ global symbols +++
+
+CW      = $0090 =   144          program22.asm:4
+CWR     = $00F3 =   243          program22.asm:5
+LOOP    = $C004 = 49156          program22.asm:14
+PADR    = $00F0 =   240          program22.asm:6
+PBDR    = $00F1 =   241          program22.asm:7 (unused)
+PCDR    = $00F2 =   242          program22.asm:8
+_end    = $C00C = 49164          program22.asm:9 (unused)
+_size   = $000C =    12          program22.asm:9 (unused)
+
+
+total time: 0.0019 sec.
+no errors

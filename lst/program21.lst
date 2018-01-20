@@ -1,0 +1,53 @@
+              	; --------------------------------------
+              	; zasm: assemble "program21.asm"
+              	; date: 2018-01-13 17:55:25
+              	; --------------------------------------
+
+
+              	;--------------------------------------
+              	;   演習プログラム21
+              	;--------------------------------------
+0080:         	CW      EQU     80H         ; コントロールワード
+00F3:         	CWR     EQU     0F3H        ; コントロールワードレジスタ
+00F0:         	PADR    EQU     0F0H        ; PORTAレジスタ
+00F1:         	PBDR    EQU     0F1H        ; PORTBレジスタ
+00F2:         	PCDR    EQU     0F2H        ; PORTCレジスタ
+006D:         	LED     EQU     06DH        ; LED点灯パターン
+0002:         	SEG     EQU     002H        ; セグメント選択
+              	
+C000:         	        ORG     0C000H
+C000: 3E80    	        LD      A, CW       ; コントロールワードをAレジスタへ
+C002: D3F3    	        OUT     (CWR), A    ; コントロールワードレジスタへ出力
+              	
+C004: 3E6D    	        LD      A, LED      ; 点灯パターンをAレジスタへ
+C006: D3F0    	        OUT     (PADR), A   ; PORTAレジスタへ出力
+              	
+C008: 3E02    	        LD      A, SEG      ; 点灯させるセグメントを選択
+C00A: D3F2    	        OUT     (PCDR), A   ; PORTCレジスタへ出力
+              	
+C00C: C9      	        RET
+              	
+              	        END
+              	
+              	        
+
+
+; +++ segments +++
+
+#CODE          = $C000 = 49152,  size = $000D =    13
+
+; +++ global symbols +++
+
+CW      = $0080 =   128          program21.asm:4
+CWR     = $00F3 =   243          program21.asm:5
+LED     = $006D =   109          program21.asm:9
+PADR    = $00F0 =   240          program21.asm:6
+PBDR    = $00F1 =   241          program21.asm:7 (unused)
+PCDR    = $00F2 =   242          program21.asm:8
+SEG     = $0002 =     2          program21.asm:10
+_end    = $C00D = 49165          program21.asm:11 (unused)
+_size   = $000D =    13          program21.asm:11 (unused)
+
+
+total time: 0.0017 sec.
+no errors
