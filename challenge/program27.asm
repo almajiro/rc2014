@@ -1,5 +1,5 @@
 ;--------------------------------------
-;   演習プログラム24
+;   演習プログラム27
 ;--------------------------------------
 CW      EQU     90H         ; コントロールワード
 CWR     EQU     0F3H        ; コントロールワードレジスタ
@@ -7,29 +7,25 @@ PADR    EQU     0F0H        ; PORTAレジスタ
 PBDR    EQU     0F1H        ; PORTBレジスタ
 PCDR    EQU     0F2H        ; PORTCレジスタ
 SP_A    EQU     0C200H      ; SP
+PATA    EQU     055H        ; PATTERN 1
+PATB    EQU     0AAH        ; PATTERN2
 
         ORG     0C000H
         LD      A, CW       ; コントロールワードをAレジスタへ
         OUT     (CWR), A    ; コントロールワードレジスタへ出力
         LD      SP, SP_A
 
-LOOP:   LD      A, 0FFH
+LOOP:   LD      A, PATA
         OUT     (PCDR), A
-        CALL    TIM4
-        LD      A, 000H
+        CALL    TIM3
+        LD      A, PATB
         OUT     (PCDR), A
-        CALL    TIM4
+        CALL    TIM3
         JP      LOOP
 
         RET
 
-TIM4:   LD      E, 50D      ; 5s delay loop
-DLOOP4: CALL    TIM3
-        DEC     E
-        JP      NZ, DLOOP4
-        RET
-
-TIM3:   LD      D, 10D      ; 100ms delay loop
+TIM3:   LD      D, 50D      ; 500ms delay loop
 DLOOP3: CALL    TIM2
         DEC     D
         JP      NZ, DLOOP3

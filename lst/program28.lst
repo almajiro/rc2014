@@ -1,0 +1,83 @@
+              	; --------------------------------------
+              	; zasm: assemble "program28.asm"
+              	; date: 2018-02-10 17:56:10
+              	; --------------------------------------
+
+
+              	;--------------------------------------
+              	;   演習プログラム25
+              	;--------------------------------------
+0090:         	CW      EQU     90H         ; コントロールワード
+00F3:         	CWR     EQU     0F3H        ; コントロールワードレジスタ
+00F0:         	PADR    EQU     0F0H        ; PORTAレジスタ
+00F1:         	PBDR    EQU     0F1H        ; PORTBレジスタ
+00F2:         	PCDR    EQU     0F2H        ; PORTCレジスタ
+C200:         	SP_A    EQU     0C200H      ; SP
+              	
+C000:         	        ORG     0C000H
+C000: 3E90    	        LD      A, CW       ; コントロールワードをAレジスタへ
+C002: D3F3    	        OUT     (CWR), A    ; コントロールワードレジスタへ出力
+C004: 3100C2  	        LD      SP, SP_A
+              	
+C007: 3E80    	LOOP:   LD      A, 80H
+C009: D3F2    	CNT2:   OUT     (PCDR), A
+C00B: CD19C0  	        CALL    TIM3
+C00E: CB47    	        BIT     0, A
+C010: CB3F    	        SRL     A
+C012: C209C0  	        JP      NZ, CNT2
+C015: C307C0  	        JP      LOOP
+              	
+C018: C9      	        RET
+              	
+C019: 1605    	TIM3:   LD      D, 5D
+C01B: CD23C0  	DLOOP3: CALL    TIM2
+C01E: 15      	        DEC     D
+C01F: C21BC0  	        JP      NZ, DLOOP3
+C022: C9      	        RET
+              	
+C023: 0E64    	TIM2:   LD      C, 100D     ; 10ms delay loop 
+C025: CD2FC0  	DLOOP2: CALL    TIM1        ; 17 state
+C028: 0D      	        DEC     C
+C029: 00      	        NOP
+C02A: 00      	        NOP
+C02B: C225C0  	        JP      NZ, DLOOP2
+C02E: C9      	        RET
+              	
+C02F: 061F    	TIM1:   LD      B, 31D      ; 100us delay loop
+C031: 05      	DLOOP1: DEC     B           ; 4 state
+C032: 00      	        NOP                 ; 4 state
+C033: 00      	        NOP
+C034: C231C0  	        JP      NZ, DLOOP1  ; 10 state
+C037: C9      	        RET
+              	
+              	        END
+              	
+              	        
+
+
+; +++ segments +++
+
+#CODE          = $C000 = 49152,  size = $0038 =    56
+
+; +++ global symbols +++
+
+CNT2    = $C009 = 49161          program28.asm:17
+CW      = $0090 =   144          program28.asm:4
+CWR     = $00F3 =   243          program28.asm:5
+DLOOP1  = $C031 = 49201          program28.asm:41
+DLOOP2  = $C025 = 49189          program28.asm:33
+DLOOP3  = $C01B = 49179          program28.asm:27
+LOOP    = $C007 = 49159          program28.asm:16
+PADR    = $00F0 =   240          program28.asm:6 (unused)
+PBDR    = $00F1 =   241          program28.asm:7 (unused)
+PCDR    = $00F2 =   242          program28.asm:8
+SP_A    = $C200 = 49664          program28.asm:9
+TIM1    = $C02F = 49199          program28.asm:40
+TIM2    = $C023 = 49187          program28.asm:32
+TIM3    = $C019 = 49177          program28.asm:26
+_end    = $C038 = 49208          program28.asm:10 (unused)
+_size   = $0038 =    56          program28.asm:10 (unused)
+
+
+total time: 0.0027 sec.
+no errors

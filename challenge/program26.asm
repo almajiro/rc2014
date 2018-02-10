@@ -1,5 +1,5 @@
 ;--------------------------------------
-;   演習プログラム24
+;   演習プログラム26
 ;--------------------------------------
 CW      EQU     90H         ; コントロールワード
 CWR     EQU     0F3H        ; コントロールワードレジスタ
@@ -13,26 +13,29 @@ SP_A    EQU     0C200H      ; SP
         OUT     (CWR), A    ; コントロールワードレジスタへ出力
         LD      SP, SP_A
 
+        LD      E, 100D
+
 LOOP:   LD      A, 0FFH
         OUT     (PCDR), A
-        CALL    TIM4
+        LD      D, E
+        CALL    TIM3
         LD      A, 000H
         OUT     (PCDR), A
-        CALL    TIM4
-        JP      LOOP
+        LD      D, E
+        CALL    TIM3
+        LD      A, E
+        SUB     A, 5
+        LD      E, A
+        JP      NZ, LOOP
+
+        LD      A, 0FFH
+        OUT     (PCDR), A
 
         RET
 
-TIM4:   LD      E, 50D      ; 5s delay loop
-DLOOP4: CALL    TIM3
-        DEC     E
-        JP      NZ, DLOOP4
-        RET
-
-TIM3:   LD      D, 10D      ; 100ms delay loop
-DLOOP3: CALL    TIM2
+TIM3:   CALL    TIM2
         DEC     D
-        JP      NZ, DLOOP3
+        JP      NZ, TIM3
         RET
 
 TIM2:   LD      C, 100D     ; 10ms delay loop 

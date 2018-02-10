@@ -1,0 +1,90 @@
+              	; --------------------------------------
+              	; zasm: assemble "program26.asm"
+              	; date: 2018-02-10 13:44:22
+              	; --------------------------------------
+
+
+              	;--------------------------------------
+              	;   演習プログラム26
+              	;--------------------------------------
+0090:         	CW      EQU     90H         ; コントロールワード
+00F3:         	CWR     EQU     0F3H        ; コントロールワードレジスタ
+00F0:         	PADR    EQU     0F0H        ; PORTAレジスタ
+00F1:         	PBDR    EQU     0F1H        ; PORTBレジスタ
+00F2:         	PCDR    EQU     0F2H        ; PORTCレジスタ
+C200:         	SP_A    EQU     0C200H      ; SP
+              	
+C000:         	        ORG     0C000H
+C000: 3E90    	        LD      A, CW       ; コントロールワードをAレジスタへ
+C002: D3F3    	        OUT     (CWR), A    ; コントロールワードレジスタへ出力
+C004: 3100C2  	        LD      SP, SP_A
+              	
+C007: 1E64    	        LD      E, 100D
+              	
+C009: 3EFF    	LOOP:   LD      A, 0FFH
+C00B: D3F2    	        OUT     (PCDR), A
+C00D: 53      	        LD      D, E
+C00E: CD25C0  	        CALL    TIM3
+C011: 3E00    	        LD      A, 000H
+C013: D3F2    	        OUT     (PCDR), A
+C015: 53      	        LD      D, E
+C016: CD25C0  	        CALL    TIM3
+C019: 7B      	        LD      A, E
+C01A: D605    	        SUB     A, 5
+C01C: 5F      	        LD      E, A
+C01D: C209C0  	        JP      NZ, LOOP
+              	
+C020: 3EFF    	        LD      A, 0FFH
+C022: D3F2    	        OUT     (PCDR), A
+              	
+C024: C9      	        RET
+              	
+C025: CD2DC0  	TIM3:   CALL    TIM2
+C028: 15      	        DEC     D
+C029: C225C0  	        JP      NZ, TIM3
+C02C: C9      	        RET
+              	
+C02D: 0E64    	TIM2:   LD      C, 100D     ; 10ms delay loop 
+C02F: CD39C0  	DLOOP2: CALL    TIM1        ; 17 state
+C032: 0D      	        DEC     C
+C033: 00      	        NOP
+C034: 00      	        NOP
+C035: C22FC0  	        JP      NZ, DLOOP2
+C038: C9      	        RET
+              	
+C039: 061F    	TIM1:   LD      B, 31D      ; 100us delay loop
+C03B: 05      	DLOOP1: DEC     B           ; 4 state
+C03C: 00      	        NOP                 ; 4 state
+C03D: 00      	        NOP
+C03E: C23BC0  	        JP      NZ, DLOOP1  ; 10 state
+C041: C9      	        RET
+              	
+              	        END
+              	
+              	        
+
+
+; +++ segments +++
+
+#CODE          = $C000 = 49152,  size = $0042 =    66
+
+; +++ global symbols +++
+
+CW      = $0090 =   144          program26.asm:4
+CWR     = $00F3 =   243          program26.asm:5
+DLOOP1  = $C03B = 49211          program26.asm:50
+DLOOP2  = $C02F = 49199          program26.asm:42
+LOOP    = $C009 = 49161          program26.asm:18
+PADR    = $00F0 =   240          program26.asm:6 (unused)
+PBDR    = $00F1 =   241          program26.asm:7 (unused)
+PCDR    = $00F2 =   242          program26.asm:8
+SP_A    = $C200 = 49664          program26.asm:9
+TIM1    = $C039 = 49209          program26.asm:49
+TIM2    = $C02D = 49197          program26.asm:41
+TIM3    = $C025 = 49189          program26.asm:36
+_end    = $C042 = 49218          program26.asm:10 (unused)
+_size   = $0042 =    66          program26.asm:10 (unused)
+
+
+total time: 0.0024 sec.
+no errors
