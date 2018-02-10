@@ -1,0 +1,69 @@
+              	; --------------------------------------
+              	; zasm: assemble "program23.asm"
+              	; date: 2018-01-20 17:14:21
+              	; --------------------------------------
+
+
+              	;--------------------------------------
+              	;   演習プログラム23
+              	;--------------------------------------
+0090:         	CW      EQU     90H         ; コントロールワード
+00F3:         	CWR     EQU     0F3H        ; コントロールワードレジスタ
+00F0:         	PADR    EQU     0F0H        ; PORTAレジスタ
+00F1:         	PBDR    EQU     0F1H        ; PORTBレジスタ
+00F2:         	PCDR    EQU     0F2H        ; PORTCレジスタ
+0001:         	SEG     EQU     01H         ; 表示するセグメント
+              	
+C000:         	        ORG     0C000H
+C000: 3E90    	        LD      A, CW       ; コントロールワードをAレジスタへ
+C002: D3F3    	        OUT     (CWR), A    ; コントロールワードレジスタへ出力
+              	
+C004: 3E01    	        LD      A, SEG
+C006: D3F1    	        OUT     (PBDR), A
+              	
+C008: 160F    	        LD      D, 0FH
+              	
+C00A: 210000  	LOOP:   LD      HL, 0
+C00D: DBF0    	        IN      A, (PADR)
+C00F: A2      	        AND     A, D
+C010: 6F      	        LD      L, A
+C011: 011CC0  	        LD      BC, DISP
+C014: 09      	        ADD     HL, BC
+C015: 7E      	        LD      A, (HL)
+C016: D3F2    	        OUT     (PCDR), A
+              	
+C018: C30AC0  	        JP      LOOP
+              	
+C01B: C9      	        RET
+              	
+C01C: 3F065B4F	DISP    DEFB    3FH, 06H, 5BH, 4FH, 66H, 6DH, 7DH
+C020: 666D7D  	
+C023: 077F6F77	        DEFB    07H, 7FH, 6FH, 77H, 7CH, 58H, 5EH
+C027: 7C585E  	
+C02A: 7971    	        DEFB    79H, 71H
+              	
+              	        END
+              	
+              	        
+
+
+; +++ segments +++
+
+#CODE          = $C000 = 49152,  size = $002C =    44
+
+; +++ global symbols +++
+
+CW      = $0090 =   144          program23.asm:4
+CWR     = $00F3 =   243          program23.asm:5
+DISP    = $C01C = 49180          program23.asm:33
+LOOP    = $C00A = 49162          program23.asm:20
+PADR    = $00F0 =   240          program23.asm:6
+PBDR    = $00F1 =   241          program23.asm:7
+PCDR    = $00F2 =   242          program23.asm:8
+SEG     = $0001 =     1          program23.asm:9
+_end    = $C02C = 49196          program23.asm:10 (unused)
+_size   = $002C =    44          program23.asm:10 (unused)
+
+
+total time: 0.0024 sec.
+no errors

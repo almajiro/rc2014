@@ -21,8 +21,7 @@ LOOP:   LD      HL, 0
         IN      A, (PADR)
         AND     A, D
         LD      L, A
-        LD      BC, HL
-        LD      HL, DISP
+        LD      BC, DISP
         ADD     HL, BC
         LD      A, (HL)
         OUT     (PCDR), A
