@@ -1,5 +1,5 @@
 ;--------------------------------------
-;   演習プログラム30
+;   演習プログラム29
 ;--------------------------------------
 CW      EQU     90H         ; コントロールワード
 CWR     EQU     0F3H        ; コントロールワードレジスタ
@@ -16,9 +16,8 @@ SP_A    EQU     0C200H      ; SP
         LD      A, 01H
         OUT     (PBDR), A
 
-LOOP:   LD      A, 01H      ; 表示パターン
+LOOP:   LD      A, 20H      ; 表示パターン
         LD      B, 01H      ; 表示中のセグメント
-        LD      C, 04H
 
 CNT:    OUT     (PCDR), A   ; 表示パターンの変更
 
@@ -34,7 +33,7 @@ CHK1:   BIT     0, A
         DEC     C
         JP      Z, NEXT
 
-        CALL    SEGR
+        CALL    SEGL
         JP      NZ, CNT
         
 CHK2:   BIT     3, A        ; 08Hの時
@@ -43,16 +42,14 @@ CHK2:   BIT     3, A        ; 08Hの時
         DEC     C
         JP      Z, NEXT
 
-        CALL    SEGL
+        CALL    SEGR
         JP      NZ, CNT
 
-NEXT    SLA     A
-        LD      D, 40H
-        CP      D
-        JP      Z, LOOP
-
+NEXT    SRL     A
         LD      C, 04H
         JP      NZ, CNT
+
+        JP      LOOP
 
         RET
 
