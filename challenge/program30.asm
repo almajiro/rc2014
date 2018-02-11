@@ -13,21 +13,60 @@ SP_A    EQU     0C200H      ; SP
         OUT     (CWR), A    ; コントロールワードレジスタへ出力
         LD      SP, SP_A
 
-LOOP:   LD      A, 01H
+        LD      A, 01H
+        OUT     (PBDR), A
 
-CNT:    OUT     (PCDR), A
+LOOP:   LD      A, 20H      ; 表示パターン
+        LD      B, 01H      ; 表示中のセグメント
+
+CNT:    OUT     (PCDR), A   ; 表示パターンの変更
+
+        PUSH    BC
+        PUSH    DE
         CALL    TIM3
-        SLA     A
+        POP     DE
+        POP     BC
+
+CHK1:   BIT     0, A
+        JP      Z, CHK2
+
+        DEC     C
+        JP      Z, NEXT
+
+        CALL    SEGL
+        JP      NZ, CNT
+        
+CHK2:   BIT     3, A        ; 08Hの時
+        JP      Z, NEXT
+
+        DEC     C
+        JP      Z, NEXT
+
+        CALL    SEGR
         JP      NZ, CNT
 
-        LD      A, 80H
-CNT2:   OUT     (PCDR), A
-        CALL    TIM3
-        SRL     A
-        JP      NZ, CNT2
+NEXT    SRL     A
+        LD      C, 04H
+        JP      NZ, CNT
 
         JP      LOOP
 
+        RET
+
+SEGL:   PUSH    AF
+        LD      A, B
+        SRL     A
+        OUT     (PBDR), A
+        LD      B, A
+        POP     AF
+        RET
+
+SEGR:   PUSH    AF
+        LD      A, B
+        SLA     A
+        OUT     (PBDR), A
+        LD      B,A
+        POP     AF
         RET
 
 TIM3:   LD      D, 5D
@@ -51,6 +90,6 @@ DLOOP1: DEC     B           ; 4 state
         JP      NZ, DLOOP1  ; 10 state
         RET
 
-        END
+PAT     DEFB    20H, 01H, 02H, 04H, 08H, 10H
 
-        
+        END 

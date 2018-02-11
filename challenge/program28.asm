@@ -1,5 +1,5 @@
 ;--------------------------------------
-;   演習プログラム25
+;   演習プログラム28
 ;--------------------------------------
 CW      EQU     90H         ; コントロールワード
 CWR     EQU     0F3H        ; コントロールワードレジスタ
@@ -14,11 +14,11 @@ SP_A    EQU     0C200H      ; SP
         LD      SP, SP_A
 
 LOOP:   LD      A, 80H
-CNT2:   OUT     (PCDR), A
+CNT:    OUT     (PCDR), A
         CALL    TIM3
         BIT     0, A
         SRL     A
-        JP      NZ, CNT2
+        JP      NZ, CNT
         JP      LOOP
 
         RET
