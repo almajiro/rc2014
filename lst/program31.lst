@@ -1,0 +1,171 @@
+              	; --------------------------------------
+              	; zasm: assemble "program31.asm"
+              	; date: 2018-02-12 17:18:21
+              	; --------------------------------------
+
+
+              	;--------------------------------------
+              	;   演習プログラム30
+              	;--------------------------------------
+0090:         	CW      EQU     90H             ; コントロールワード
+00F3:         	CWR     EQU     0F3H            ; コントロールワードレジスタ
+00F0:         	PADR    EQU     0F0H            ; PORTAレジスタ
+00F1:         	PBDR    EQU     0F1H            ; PORTBレジスタ
+00F2:         	PCDR    EQU     0F2H            ; PORTCレジスタ
+C200:         	SP_A    EQU     0C200H          ; SP
+              	
+C000:         	        ORG     0C000H
+C000: 3E90    	        LD      A, CW           ; コントロールワードをAレジスタへ
+C002: D3F3    	        OUT     (CWR), A        ; コントロールワードレジスタへ出力
+C004: 3100C2  	        LD      SP, SP_A
+              	
+C007: 3E01    	LOOP:	LD	A, 01H
+C009: D3F1    		OUT     (PBDR), A
+C00B: 0601    		LD	B, 01H 	        ; 表示中のセグメント
+              	
+C00D: DBF0    		IN	A, (PADR)
+C00F: 5F      		LD	E, A	        ; 動く方向の選択
+              					; 1 右回り
+              					; 0 左回り
+              	
+C010: CB43    		BIT	0, E
+C012: 3E01    		LD	A, 01H		; 表示パターン
+C014: C21CC0  		JP	NZ, ACTION
+C017: 3E20    		LD	A, 20H		; 表示パターン
+C019: C31CC0  		JP	ACTION
+              	
+C01C: 0E04    	ACTION:	LD      C, 04H          ; カウンタ
+              	
+C01E: D3F2    	CNT:    OUT     (PCDR), A       ; 表示パターンの変更
+C020: CD87C0  	        CALL    TIM3
+              	
+C023: CB47    	CHK1:   BIT     0, A            ; 01Hの時
+C025: CA3DC0  	        JP      Z, CHK2
+              	
+C028: 0D      	        DEC     C
+C029: CA57C0  	        JP      Z, NEXT         ; カウンタが0の場合
+              	
+C02C: CB43    	        BIT     0, E
+C02E: CA37C0  	        JP      Z, CHK1S
+C031: CD7EC0  	        CALL    SEGR
+C034: C31EC0  	        JP      CNT
+C037: CD75C0  	CHK1S:  CALL    SEGL
+C03A: C31EC0  	        JP      CNT
+              	        
+C03D: CB5F    	CHK2:   BIT     3, A            ; 08Hの時
+C03F: CA57C0  	        JP      Z, NEXT
+              	
+C042: 0D      	        DEC     C
+C043: CA57C0  	        JP      Z, NEXT         ; カウンタが0の場合
+              	
+C046: CB43    	        BIT     0, E
+C048: CA51C0  	        JP      Z, CHK2S
+C04B: CD75C0  	        CALL    SEGL
+C04E: C31EC0  	        JP      CNT
+C051: CD7EC0  	CHK2S:  CALL    SEGR
+C054: C31EC0  	        JP      CNT
+              	
+              	; 次のパターンへの準備
+C057: CB43    	NEXT:   BIT     0, E            ; 方向の判定
+C059: CA67C0  	        JP      Z, PRE
+C05C: CB27    	        SLA     A               ; 左へビットシフト
+C05E: 1640    	        LD      D, 40H
+C060: BA      	        CP      D
+C061: CA07C0  	        JP      Z, LOOP         ; パターンのシフトが終わったらLOOPへ
+C064: C36FC0  	        JP      GNEXT           ; 次のパターンへ (CNT)
+              	
+C067: CB3F    	PRE:    SRL     A
+C069: C26FC0  	        JP      NZ, GNEXT       ; 次のパターンへ (CNT)
+C06C: CA07C0  	        JP      Z, LOOP         ; パータンのシフトが終わったらLOOPへ
+              	
+C06F: 0E04    	GNEXT:  LD      C, 04H
+C071: C31EC0  	        JP      CNT
+              	
+C074: C9      	        RET
+              	
+              	; その他のサブルーチン
+              	; 左へセグメントをシフト
+C075: F5      	SEGL:   PUSH    AF
+C076: 78      	        LD      A, B
+C077: CB3F    	        SRL     A
+C079: D3F1    	        OUT     (PBDR), A
+C07B: 47      	        LD      B, A
+C07C: F1      	        POP     AF
+C07D: C9      	        RET
+              	
+              	; 右へセグメントをシフト
+C07E: F5      	SEGR:   PUSH    AF
+C07F: 78      	        LD      A, B
+C080: CB27    	        SLA     A
+C082: D3F1    	        OUT     (PBDR), A
+C084: 47      	        LD      B,A
+C085: F1      	        POP     AF
+C086: C9      	        RET
+              	
+              	; タイマールーチン
+C087: 1605    	TIM3:   LD      D, 5D
+C089: C5      	        PUSH    BC
+C08A: D5      	        PUSH    DE
+C08B: CD95C0  	DLOOP3: CALL    TIM2
+C08E: 15      	        DEC     D
+C08F: C28BC0  	        JP      NZ, DLOOP3
+C092: D1      	        POP     DE
+C093: C1      	        POP     BC
+C094: C9      	        RET
+              	
+              	; 10ms Delay
+C095: 0E64    	TIM2:   LD      C, 100D 
+C097: CDA1C0  	DLOOP2: CALL    TIM1
+C09A: 0D      	        DEC     C
+C09B: 00      	        NOP
+C09C: 00      	        NOP
+C09D: C297C0  	        JP      NZ, DLOOP2
+C0A0: C9      	        RET
+              	
+              	; 100ns Delay
+C0A1: 061F    	TIM1:   LD      B, 31D
+C0A3: 05      	DLOOP1: DEC     B 
+C0A4: 00      	        NOP 
+C0A5: 00      	        NOP
+C0A6: C2A3C0  	        JP      NZ, DLOOP1
+C0A9: C9      	        RET
+              	
+              	        END 
+
+
+; +++ segments +++
+
+#CODE          = $C000 = 49152,  size = $00AA =   170
+
+; +++ global symbols +++
+
+ACTION  = $C01C = 49180          program31.asm:31
+CHK1    = $C023 = 49187          program31.asm:36 (unused)
+CHK1S   = $C037 = 49207          program31.asm:46
+CHK2    = $C03D = 49213          program31.asm:49
+CHK2S   = $C051 = 49233          program31.asm:59
+CNT     = $C01E = 49182          program31.asm:33
+CW      = $0090 =   144          program31.asm:4
+CWR     = $00F3 =   243          program31.asm:5
+DLOOP1  = $C0A3 = 49315          program31.asm:121
+DLOOP2  = $C097 = 49303          program31.asm:112
+DLOOP3  = $C08B = 49291          program31.asm:103
+GNEXT   = $C06F = 49263          program31.asm:75
+LOOP    = $C007 = 49159          program31.asm:16
+NEXT    = $C057 = 49239          program31.asm:63
+PADR    = $00F0 =   240          program31.asm:6
+PBDR    = $00F1 =   241          program31.asm:7
+PCDR    = $00F2 =   242          program31.asm:8
+PRE     = $C067 = 49255          program31.asm:71
+SEGL    = $C075 = 49269          program31.asm:82
+SEGR    = $C07E = 49278          program31.asm:91
+SP_A    = $C200 = 49664          program31.asm:9
+TIM1    = $C0A1 = 49313          program31.asm:120
+TIM2    = $C095 = 49301          program31.asm:111
+TIM3    = $C087 = 49287          program31.asm:100
+_end    = $C0AA = 49322          program31.asm:10 (unused)
+_size   = $00AA =   170          program31.asm:10 (unused)
+
+
+total time: 0.0040 sec.
+no errors

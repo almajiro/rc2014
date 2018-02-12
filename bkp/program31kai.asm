@@ -16,7 +16,9 @@ SP_A    EQU     0C200H      ; SP
         LD      A, 01H
         OUT     (PBDR), A
 
-LOOP:   LD      A, 01H      ; 表示パターン
+LOOP:   IN      A, (PADR)
+        LD      H, A
+        LD      A, 01H      ; 表示パターン
         LD      B, 01H      ; 表示中のセグメント
         LD      C, 04H
 
@@ -33,8 +35,14 @@ CHK1:   BIT     0, A
 
         DEC     C
         JP      Z, NEXT
+        
+        BIT     0, H
+        JP      Z, CHK1C
+        CALL    SEGL
+        JP      CHK1N
 
-        CALL    SEGR
+CHK1C:  CALL    SEGR
+CHK1N:  
         JP      NZ, CNT
         
 CHK2:   BIT     3, A        ; 08Hの時
@@ -43,17 +51,24 @@ CHK2:   BIT     3, A        ; 08Hの時
         DEC     C
         JP      Z, NEXT
 
-        CALL    SEGL
-        JP      NZ, CNT
+        BIT     0, H
+        JP      Z, CHK2C
+        CALL    SEGR
+        JP      CHK2N
 
-NEXT    SLA     A
-        LD      D, 40H
+CHK2C:  CALL    SEGL
+CHK2N:  JP      NZ, CNT
+
+NEXT:   BIT     0, H
+        JP      Z, SHIFT
+        SRL     A
+        JP      GN
+SHIFT:  SLA     A
+GN:     LD      D, 40H
         CP      D
         JP      Z, LOOP
-
         LD      C, 04H
         JP      NZ, CNT
-
         RET
 
 SEGL:   PUSH    AF
@@ -72,7 +87,7 @@ SEGR:   PUSH    AF
         POP     AF
         RET
 
-TIM3:   LD      D, 5D
+TIM3:   LD      D, 50D
 DLOOP3: CALL    TIM2
         DEC     D
         JP      NZ, DLOOP3
