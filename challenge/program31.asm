@@ -1,5 +1,5 @@
 ;--------------------------------------
-;   演習プログラム30
+;   演習プログラム31
 ;--------------------------------------
 CW      EQU     90H             ; コントロールワード
 CWR     EQU     0F3H            ; コントロールワードレジスタ
@@ -26,7 +26,6 @@ LOOP:	LD	A, 01H
 	LD	A, 01H		; 表示パターン
 	JP	NZ, ACTION
 	LD	A, 20H		; 表示パターン
-	JP	ACTION
 
 ACTION:	LD      C, 04H          ; カウンタ
 
@@ -70,7 +69,7 @@ NEXT:   BIT     0, E            ; 方向の判定
 
 PRE:    SRL     A
         JP      NZ, GNEXT       ; 次のパターンへ (CNT)
-        JP      Z, LOOP         ; パータンのシフトが終わったらLOOPへ
+        JP      Z, LOOP         ; パターンのシフトが終わったらLOOPへ
 
 GNEXT:  LD      C, 04H
         JP      CNT

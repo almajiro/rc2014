@@ -1,0 +1,87 @@
+              	; --------------------------------------
+              	; zasm: assemble "program32.asm"
+              	; date: 2018-02-17 11:07:51
+              	; --------------------------------------
+
+
+              	;--------------------------------------
+              	;   演習プログラム32
+              	;--------------------------------------
+0090:         	CW      EQU     90H             ; コントロールワード
+00F3:         	CWR     EQU     0F3H            ; コントロールワードレジスタ
+00F0:         	PADR    EQU     0F0H            ; PORTAレジスタ
+00F1:         	PBDR    EQU     0F1H            ; PORTBレジスタ
+00F2:         	PCDR    EQU     0F2H            ; PORTCレジスタ
+C200:         	SP_A    EQU     0C200H          ; SP
+              	
+C000:         	        ORG     0C000H
+C000: 3E90    	        LD      A, CW           ; コントロールワードをAレジスタへ
+C002: D3F3    	        OUT     (CWR), A        ; コントロールワードレジスタへ出力
+C004: 3100C2  	        LD      SP, SP_A
+              	
+C007: 0EFF    	        LD      C, 255D
+              	
+C009: 3E01    	LOOP:   LD      A, 01H
+C00B: D3F2    	LEFT:   OUT     (PCDR), A
+C00D: CD2CC0  	        CALL    TIM3
+C010: CB27    	        SLA     A
+C012: C20BC0  	        JP      NZ, LEFT
+              	
+C015: 3E80    	        LD      A, 80H
+C017: D3F2    	RIGHT:  OUT     (PCDR), A
+C019: CD2CC0  	        CALL    TIM3
+C01C: CB3F    	        SRL     A
+C01E: C217C0  	        JP      NZ, RIGHT
+              	
+C021: 79      	        LD      A, C
+C022: FE01    	        CP      1D
+C024: CA09C0  	        JP      Z, LOOP
+              	
+C027: 0D      	        DEC     C
+C028: C309C0  	        JP      LOOP
+              	
+C02B: C9      	        RET
+              	
+C02C: 51      	TIM3:   LD      D, C
+C02D: CD35C0  	DLOOP3: CALL    TIM1
+C030: 15      	        DEC     D
+C031: C22DC0  	        JP      NZ, DLOOP3
+C034: C9      	        RET
+              	
+C035: 061F    	TIM1:   LD      B, 31D          ; 100us delay loop
+C037: 05      	DLOOP1: DEC     B               ; 4 state
+C038: 00      	        NOP                     ; 4 state
+C039: 00      	        NOP
+C03A: C237C0  	        JP      NZ, DLOOP1      ; 10 state
+C03D: C9      	        RET
+              	
+              	        END
+              	
+              	        
+
+
+; +++ segments +++
+
+#CODE          = $C000 = 49152,  size = $003E =    62
+
+; +++ global symbols +++
+
+CW      = $0090 =   144          program32.asm:4
+CWR     = $00F3 =   243          program32.asm:5
+DLOOP1  = $C037 = 49207          program32.asm:46
+DLOOP3  = $C02D = 49197          program32.asm:40
+LEFT    = $C00B = 49163          program32.asm:19
+LOOP    = $C009 = 49161          program32.asm:18
+PADR    = $00F0 =   240          program32.asm:6 (unused)
+PBDR    = $00F1 =   241          program32.asm:7 (unused)
+PCDR    = $00F2 =   242          program32.asm:8
+RIGHT   = $C017 = 49175          program32.asm:25
+SP_A    = $C200 = 49664          program32.asm:9
+TIM1    = $C035 = 49205          program32.asm:45
+TIM3    = $C02C = 49196          program32.asm:39
+_end    = $C03E = 49214          program32.asm:10 (unused)
+_size   = $003E =    62          program32.asm:10 (unused)
+
+
+total time: 0.0024 sec.
+no errors
